@@ -7,8 +7,8 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
   const [all, setAll] = useState(0)
-  const average = (good - bad) / all
-  const positive = good / all * 100 + ' %'
+  const average = Math.round((good - bad) / all * 10) / 10
+  const positive = Math.round(good / all * 100 * 10) / 10 + ' %'
 
   const handleGoodClick = () => {
     const updatedGood = good + 1
@@ -54,20 +54,23 @@ const Statistics = ({ good, neutral, bad, all, average, positive }) => {
     )
   }
   return (
-    <>
-      <StatisticLine text='good' statistic={good} />
-      <StatisticLine text='neutral' statistic={neutral} />
-      <StatisticLine text='bad' statistic={bad} />
-      <StatisticLine text='all' statistic={all} />
-      <StatisticLine text='average' statistic={average} />
-      <StatisticLine text='positive' statistic={positive} />
-    </>
+    <table>
+      <tr><StatisticLine text='good' statistic={good} /></tr>
+      <tr><StatisticLine text='neutral' statistic={neutral} /></tr>
+      <tr><StatisticLine text='bad' statistic={bad} /></tr>
+      <tr><StatisticLine text='all' statistic={all} /></tr>
+      <tr><StatisticLine text='average' statistic={average} /></tr>
+      <tr><StatisticLine text='positive' statistic={positive} /></tr>
+    </table>
   )
 
 }
 
 const StatisticLine = ({ text, statistic }) => (
-  <p>{text} {statistic}</p>
+  <>
+    <td>{text}</td>
+    <td>{statistic}</td>
+  </>
 )
 
 export default App
