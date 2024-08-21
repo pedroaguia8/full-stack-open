@@ -6,17 +6,26 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
+  const [all, setAll] = useState(0)
+  const average = (good - bad) / all
+  const positive = good / all * 100 + ' %'
 
   const handleGoodClick = () => {
-    setGood(good + 1)
+    const updatedGood = good + 1
+    setGood(updatedGood)
+    setAll(all + 1)
   }
 
   const handleNeutralClick = () => {
-    setNeutral(neutral + 1)
+    const updatedNeutral = neutral + 1
+    setNeutral(updatedNeutral)
+    setAll(all + 1)
   }
 
   const handleBadClick = () => {
-    setBad(bad + 1)
+    const updatedBad = bad + 1
+    setBad(updatedBad)
+    setAll(all + 1)
   }
 
   return (
@@ -29,6 +38,9 @@ const App = () => {
       <Statistic text='good' statistic={good} />
       <Statistic text='neutral' statistic={neutral} />
       <Statistic text='bad' statistic={bad} />
+      <Statistic text='all' statistic={all} />
+      <Statistic text='average' statistic={average} />
+      <Statistic text='positive' statistic={positive} />
     </>
   )
 }
