@@ -6,12 +6,7 @@ const Total = ({ totalExercises }) => {
         <>
             <p><strong>total of {totalExercises} exercises</strong></p>
         </>
-
-
     )
-
-
 }
-
 
 export default Total
