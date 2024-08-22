@@ -3,9 +3,6 @@ import Content from './Content'
 
 const Course = ({ course, totalExercises }) => {
 
-
-
-
     return (
         <>
             <Header course={course} />
@@ -15,9 +12,6 @@ const Course = ({ course, totalExercises }) => {
 
     )
 
-
 }
-
-
 
 export default Course
