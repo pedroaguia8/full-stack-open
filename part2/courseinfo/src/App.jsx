@@ -23,8 +23,18 @@ const App = () => {
     ]
   }
 
+  const sumExercises = () => {
+    let total = 0
+    course.parts.forEach(part => {
+      total += part.exercises
+    })
+    return total
+  }
 
-  return <Course course={course} />
+  const totalExercises = sumExercises()
+
+
+  return <Course course={course} totalExercises={totalExercises} />
 }
 
 export default App
