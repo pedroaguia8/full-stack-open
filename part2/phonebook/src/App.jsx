@@ -38,6 +38,7 @@ const App = () => {
       const personObject = { name: newName, number: newNumber }
       setPersons(persons.concat(personObject));
       setNewName('');
+      setNewNumber('');
     }
   }
 
