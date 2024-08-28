@@ -3,7 +3,10 @@ const Person = ({ person }) => {
 
     return (
         <>
-            <li>{person.name}</li>
+            <li>
+                <div>{person.name}</div>
+                <div>{person.number}</div>
+            </li>
         </>
     )
 }
