@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
@@ -53,9 +52,11 @@ const App = () => {
   }
 
   useEffect(() => {
-    axios.get('http://localhost:3002/persons').then(response => {
-      setPersons(response.data);
-    })
+    personService
+      .getAll()
+      .then(returnedPersons => {
+        setPersons(returnedPersons);
+      })
   }, []);
 
   return (
