@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import ErrorNotification from './components/ErrorNotification'
+import SuccessNotification from './components/SuccessNotification'
 import personService from './services/persons'
 
 const App = () => {
@@ -9,6 +11,8 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [nameFilter, setNameFilter] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const personsToShow = persons.filter((person) =>
     person.name.toLowerCase().includes(nameFilter.toLowerCase())
@@ -44,6 +48,11 @@ const App = () => {
         setPersons(persons.concat(returnedPerson));
         setNewName('');
         setNewNumber('');
+
+        setSuccessMessage(`Added ${returnedPerson.name}`);
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 2000);
       });
   }
 
@@ -53,6 +62,11 @@ const App = () => {
         .remove(person.id)
         .then(() => {
           setPersons(persons.filter(p => p.id !== person.id));
+
+          setSuccessMessage(`Deleted ${person.name}`);
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 2000);
         })
         .catch(() => {
           console.log("the person was already deleted from server");
@@ -63,8 +77,15 @@ const App = () => {
   const updatePerson = (id, personObject) => {
     personService
       .update(id, personObject)
+      // We need to receive a newPerson object here because
+      // a new id is generated when the person is updated on the db
       .then((newPerson) => {
         setPersons(persons.map((person) => person.id === id ? newPerson : person));
+
+        setSuccessMessage(`Updated ${newPerson.name}`);
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 2000);
       })
       .catch(() => {
         console.log("the person was already deleted from server");
@@ -82,6 +103,8 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <ErrorNotification message={errorMessage} />
+      <SuccessNotification message={successMessage} />
       <Filter nameFilter={nameFilter} handleNameFilterChange={handleNameFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
