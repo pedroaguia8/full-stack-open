@@ -69,7 +69,12 @@ const App = () => {
           }, 2000);
         })
         .catch(() => {
-          console.log("the person was already deleted from server");
+          setErrorMessage(`Information of ${person.name} has already been removed from the server`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 2000);
+
+          setPersons(persons.filter(p => p.id !== person.id));
         })
     }
   }
@@ -88,7 +93,12 @@ const App = () => {
         }, 2000);
       })
       .catch(() => {
-        console.log("the person was already deleted from server");
+        setErrorMessage(`Information of ${personObject.name} has already been removed from the server`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 2000);
+
+        setPersons(persons.filter(p => p.id !== personObject.id));
       })
   }
 
