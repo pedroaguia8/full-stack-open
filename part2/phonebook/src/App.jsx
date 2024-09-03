@@ -29,18 +29,14 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault();
 
-    // If person with same name or number exists
-    // throw alert and don't add to phonebook
-    if ((persons.findIndex((person) => person.name === newName)) !== -1) {
-      alert(`Person with name ${newName} is already added to phonebook`);
-      return;
-    }
-    if ((persons.findIndex((person) => person.number === newNumber)) !== -1) {
-      alert(`Person with number ${newNumber} is already added to phonebook`);
-      return;
-    }
-
     const personObject = { name: newName, number: newNumber }
+
+    // If person with same name exists update number
+    if ((persons.findIndex((person) => person.name === newName)) !== -1) {
+      if (window.confirm(`Person with name ${newName} is already added to phonebook. Update?`))
+        updatePerson(persons.find((person) => person.name === newName).id, personObject);
+      return;
+    }
 
     personService
       .create(personObject)
@@ -56,12 +52,23 @@ const App = () => {
       personService
         .remove(person.id)
         .then(() => {
-          setPersons(persons.filter(n => n.id !== person.id));
+          setPersons(persons.filter(p => p.id !== person.id));
         })
         .catch(() => {
           console.log("the person was already deleted from server");
         })
     }
+  }
+
+  const updatePerson = (id, personObject) => {
+    personService
+      .update(id, personObject)
+      .then((newPerson) => {
+        setPersons(persons.map((person) => person.id === id ? newPerson : person));
+      })
+      .catch(() => {
+        console.log("the person was already deleted from server");
+      })
   }
 
   useEffect(() => {
