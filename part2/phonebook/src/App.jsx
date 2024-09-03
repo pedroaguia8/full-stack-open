@@ -51,6 +51,19 @@ const App = () => {
       });
   }
 
+  const deletePerson = (person) => {
+    if (window.confirm(`Delete ${person.name}`)) {
+      personService
+        .remove(person.id)
+        .then(() => {
+          setPersons(persons.filter(n => n.id !== person.id));
+        })
+        .catch(() => {
+          console.log("the person was already deleted from server");
+        })
+    }
+  }
+
   useEffect(() => {
     personService
       .getAll()
@@ -72,7 +85,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} deletePerson={deletePerson} />
 
     </div>
   )
