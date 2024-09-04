@@ -2,7 +2,7 @@
 import Country from './Country'
 import CountryList from './CountryList'
 
-const Content = ({ countries }) => {
+const Content = ({ countries, toggleShowDetailed }) => {
 
     return (
         <div>
@@ -11,7 +11,7 @@ const Content = ({ countries }) => {
             ) : countries.length === 1 ? (
                 <Country country={countries[0]} />
             ) : (
-                <CountryList countries={countries} />
+                <CountryList countries={countries} toggleShowDetailed={toggleShowDetailed} />
             )
             }
         </div>

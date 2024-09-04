@@ -17,6 +17,16 @@ function App() {
   );
 
 
+  const toggleShowDetailed = country => {
+    const countryUpdated = { ...country, showDetailed: !country.showDetailed }
+
+    setCountries(countries.map(country =>
+      country.name.common === countryUpdated.name.common ?
+        countryUpdated : country
+    ));
+  }
+
+
   useEffect(() => {
     countryService
       .getAll()
@@ -28,7 +38,7 @@ function App() {
   return (
     <>
       <Filter nameFilter={nameFilter} handleNameFilterChange={handleNameFilterChange} />
-      <Content countries={countriesToShow} />
+      <Content countries={countriesToShow} toggleShowDetailed={toggleShowDetailed} />
     </>
   )
 }

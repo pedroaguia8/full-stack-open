@@ -10,6 +10,4 @@ const Filter = ({ nameFilter, handleNameFilterChange }) => {
 }
 
 
-
-
 export default Filter
