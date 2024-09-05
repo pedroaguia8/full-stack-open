@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-
+import Weather from './Weather'
 
 const Country = ({ country }) => {
 
@@ -17,6 +17,9 @@ const Country = ({ country }) => {
                 ))}
             </ul>
             <img src={country.flags.svg} alt={flagAltText} width={200} />
+            <h2>Weather in {country.capital}</h2>
+            <Weather country={country} />
+
         </div>
     )
 }
