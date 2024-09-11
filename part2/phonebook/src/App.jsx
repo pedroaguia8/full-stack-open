@@ -106,7 +106,7 @@ const App = () => {
           }, 2000);
         }
         if (error.response.status === 404) {
-          setErrorMessage(`Information of ${personObject.name} has already been removed from the server`);
+          setErrorMessage(error.response.data.error);
           setTimeout(() => {
             setErrorMessage(null);
           }, 2000);
