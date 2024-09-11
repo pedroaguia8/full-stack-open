@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+    "title": "LOL (lots of links)",
+    "author": "Annie Rauwerda ",
+    "url": "https://annierau.com/LOL-lots-of-links",
+    "likes": 5123
+}
