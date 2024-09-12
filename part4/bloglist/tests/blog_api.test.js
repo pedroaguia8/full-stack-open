@@ -9,7 +9,7 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-describe('when there is initially some notes saved', () => {
+describe('when there are initially some blogs saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
 
@@ -78,81 +78,124 @@ describe('when there is initially some notes saved', () => {
   // })
 })
 
+describe('addition of a new blog', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
 
-test('a valid blog can be added', async () => {
-  const newBlog = {
-    title: 'title',
-    author: 'author',
-    url: 'url',
-    likes: 25,
-  }
+    const blogObjects = helper.initialBlogs
+      .map(blog => new Blog(blog))
+    const promiseArray = blogObjects.map(blog => blog.save())
+    // The promises will be executed in parallel so there's
+    // no guarantee that the order will be kept, to guarantee
+    // use for example a for...of block
+    await Promise.all(promiseArray)
+  })
 
-  const postResponse = await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+  test('succeeds with valid data', async () => {
+    const newBlog = {
+      title: 'title',
+      author: 'author',
+      url: 'url',
+      likes: 25,
+    }
 
-  const response = await api.get('/api/blogs')
+    const postResponse = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
+    const response = await api.get('/api/blogs')
 
-  // The new blog added to the database should be in the postResponse.body
-  const addedBlog = postResponse.body
+    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
 
-  // Assert that the added blog has the same title, author, url, and likes as the one sent
-  assert.strictEqual(addedBlog.title, newBlog.title)
-  assert.strictEqual(addedBlog.author, newBlog.author)
-  assert.strictEqual(addedBlog.url, newBlog.url)
-  assert.strictEqual(addedBlog.likes, newBlog.likes)
+    // The new blog added to the database should be in the postResponse.body
+    const addedBlog = postResponse.body
+
+    // Assert that the added blog has the same title, author, url, and likes as the one sent
+    assert.strictEqual(addedBlog.title, newBlog.title)
+    assert.strictEqual(addedBlog.author, newBlog.author)
+    assert.strictEqual(addedBlog.url, newBlog.url)
+    assert.strictEqual(addedBlog.likes, newBlog.likes)
+  })
+
+  test('succeeds if likes are missing and they should default to 0', async () => {
+    const newBlog = {
+      title: 'title',
+      author: 'author',
+      url: 'url',
+    }
+
+    const postResponse = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    // The new blog added to the database should be in the postResponse.body
+    const addedBlog = postResponse.body
+
+    assert.strictEqual(addedBlog.likes, 0)
+  })
+
+  test('fails with status code 400 if title is missing', async () => {
+    const newBlog = {
+      author: 'author',
+      url: 'url',
+      likes: 2,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test('fails with status code 400 if url is missing', async () => {
+    const newBlog = {
+      title: 'title',
+      author: 'author',
+      likes: 2,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
 })
 
-test('if the likes property is missing from the request, it will default to 0', async () => {
-  const newBlog = {
-    title: 'title',
-    author: 'author',
-    url: 'url',
-  }
 
-  const postResponse = await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+describe('deletion of a blog', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
 
-  // The new blog added to the database should be in the postResponse.body
-  const addedBlog = postResponse.body
+    const blogObjects = helper.initialBlogs
+      .map(blog => new Blog(blog))
+    const promiseArray = blogObjects.map(blog => blog.save())
+    // The promises will be executed in parallel so there's
+    // no guarantee that the order will be kept, to guarantee
+    // use for example a for...of block
+    await Promise.all(promiseArray)
+  })
 
-  assert.strictEqual(addedBlog.likes, 0)
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+
+    const titles = blogsAtEnd.map(r => r.title)
+    assert(!titles.includes(blogToDelete.title))
+  })
 })
-
-test('adding a blog without title gets status 400 Bad Request', async () => {
-  const newBlog = {
-    author: 'author',
-    url: 'url',
-    likes: 2,
-  }
-
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
-})
-
-test('adding a blog without url gets status 400 Bad Request', async () => {
-  const newBlog = {
-    title: 'title',
-    author: 'author',
-    likes: 2,
-  }
-
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
-})
-
-
 
 
 
