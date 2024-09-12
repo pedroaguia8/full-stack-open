@@ -79,7 +79,33 @@ describe('when there is initially some notes saved', () => {
 })
 
 
+test('a valid blog can be added ', async () => {
+    const newBlog = {
+        title: "title",
+        author: "author",
+        url: "url",
+        likes: 25,
+    }
 
+    const postResponse = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
+
+    // The new blog added to the database should be in the postResponse.body
+    const addedBlog = postResponse.body;
+
+    // Assert that the added blog has the same title, author, url, and likes as the one sent
+    assert.strictEqual(addedBlog.title, newBlog.title);
+    assert.strictEqual(addedBlog.author, newBlog.author);
+    assert.strictEqual(addedBlog.url, newBlog.url);
+    assert.strictEqual(addedBlog.likes, newBlog.likes);
+})
 
 
 
@@ -93,28 +119,7 @@ describe('when there is initially some notes saved', () => {
 //     assert.strictEqual(response.body.length, initialBlogs.length)
 // })
 
-// test('a valid blog can be added ', async () => {
-//     const newBlog = {
-//         title: "title",
-//         author: "author",
-//         url: "url",
-//         likes: 25,
-//     }
 
-//     await api
-//         .post('/api/blogs')
-//         .send(newBlog)
-//         .expect(201)
-//         .expect('Content-Type', /application\/json/)
-
-//     const response = await api.get('/api/blogs')
-
-//     const titles = response.body.map(r => r.title)
-
-//     assert.strictEqual(response.body.length, initialBlogs.length + 1)
-
-//     assert(titles.includes('title'))
-// })
 
 // test('blog without title is not added', async () => {
 //     const newBlog = {
