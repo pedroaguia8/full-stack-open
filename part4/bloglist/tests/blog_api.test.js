@@ -197,6 +197,34 @@ describe('deletion of a blog', () => {
   })
 })
 
+describe('update of a blog', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+
+    const blogObjects = helper.initialBlogs
+      .map(blog => new Blog(blog))
+    const promiseArray = blogObjects.map(blog => blog.save())
+    // The promises will be executed in parallel so there's
+    // no guarantee that the order will be kept, to guarantee
+    // use for example a for...of block
+    await Promise.all(promiseArray)
+  })
+
+  test('succeeds, a blog can be updated with new likes', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    blogToUpdate.likes = 14
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    assert.strictEqual(response.body.likes, 14)
+  })
+})
 
 
 // test('there are two blogs', async () => {
