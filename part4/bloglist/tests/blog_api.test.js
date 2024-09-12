@@ -10,120 +10,146 @@ const Blog = require('../models/blog')
 const api = supertest(app)
 
 describe('when there is initially some notes saved', () => {
-    beforeEach(async () => {
-        await Blog.deleteMany({})
+  beforeEach(async () => {
+    await Blog.deleteMany({})
 
-        const blogObjects = helper.initialBlogs
-            .map(blog => new Blog(blog))
-        const promiseArray = blogObjects.map(blog => blog.save())
-        // The promises will be executed in parallel so there's
-        // no guarantee that the order will be kept, to guarantee
-        // use for example a for...of block
-        await Promise.all(promiseArray)
+    const blogObjects = helper.initialBlogs
+      .map(blog => new Blog(blog))
+    const promiseArray = blogObjects.map(blog => blog.save())
+    // The promises will be executed in parallel so there's
+    // no guarantee that the order will be kept, to guarantee
+    // use for example a for...of block
+    await Promise.all(promiseArray)
+  })
+
+  test('all blogs are returned as json', async () => {
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.status, 200)
+    // regex: result contains 'application/json'
+    assert(response.type.match(/application\/json/))
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
+  })
+
+  test('blog posts have an id property instead of _id', async () => {
+    const response = await api.get('/api/blogs')
+
+    const blogs = response.body
+    blogs.forEach(blog => {
+      assert.ok(blog.id, 'Blog post should have an id property') // Check if 'id' is defined
+      assert.strictEqual(blog._id, undefined, 'Blog post should not have an _id property') // Check '_id' is not present
     })
+  })
 
-    test('all blogs are returned as json', async () => {
-        const response = await api.get('/api/blogs')
+  // describe('viewing a specific blog', () => {
 
-        assert.strictEqual(response.status, 200)
-        // regex: result contains 'application/json'
-        assert(response.type.match(/application\/json/))
-        assert.strictEqual(response.body.length, helper.initialBlogs.length)
-    })
-
-    test('blog posts have an id property instead of _id', async () => {
-        const response = await api.get('/api/blogs');
-
-        const blogs = response.body;
-        blogs.forEach(blog => {
-            assert.ok(blog.id, 'Blog post should have an id property'); // Check if 'id' is defined
-            assert.strictEqual(blog._id, undefined, 'Blog post should not have an _id property'); // Check '_id' is not present
-        });
-    });
-
-    // describe('viewing a specific blog', () => {
-
-    //     test('succeeds with a valid id', async () => {
-    //         const blogsAtStart = await helper.blogsInDb()
-    //         console.log(blogsAtStart);
+  //     test('succeeds with a valid id', async () => {
+  //         const blogsAtStart = await helper.blogsInDb()
+  //         console.log(blogsAtStart);
 
 
-    //         const blogToView = blogsAtStart[0]
-    //         console.log(blogToView);
-    //         console.log(blogToView.id);
+  //         const blogToView = blogsAtStart[0]
+  //         console.log(blogToView);
+  //         console.log(blogToView.id);
 
-    //         const resultBlog = await api
-    //             .get(`/api/blogs/${blogToView.id}`)
-    //             .expect(200)
-    //             .expect('Content-Type', /application\/json/)
+  //         const resultBlog = await api
+  //             .get(`/api/blogs/${blogToView.id}`)
+  //             .expect(200)
+  //             .expect('Content-Type', /application\/json/)
 
-    //         assert.deepStrictEqual(resultBlog.body, blogToView)
-    //     })
+  //         assert.deepStrictEqual(resultBlog.body, blogToView)
+  //     })
 
-    //     test('fails with statuscode 404 if note does not exist', async () => {
-    //         const validNonexistingId = await helper.nonExistingId()
+  //     test('fails with statuscode 404 if note does not exist', async () => {
+  //         const validNonexistingId = await helper.nonExistingId()
 
-    //         await api
-    //             .get(`/api/notes/${validNonexistingId}`)
-    //             .expect(404)
-    //     })
+  //         await api
+  //             .get(`/api/notes/${validNonexistingId}`)
+  //             .expect(404)
+  //     })
 
-    //     test('fails with statuscode 400 id is invalid', async () => {
-    //         const invalidId = '5a3d5da59070081a82a3445'
+  //     test('fails with statuscode 400 id is invalid', async () => {
+  //         const invalidId = '5a3d5da59070081a82a3445'
 
-    //         await api
-    //             .get(`/api/notes/${invalidId}`)
-    //             .expect(400)
-    //     })
-    // })
+  //         await api
+  //             .get(`/api/notes/${invalidId}`)
+  //             .expect(400)
+  //     })
+  // })
 })
 
 
 test('a valid blog can be added', async () => {
-    const newBlog = {
-        title: "title",
-        author: "author",
-        url: "url",
-        likes: 25,
-    }
+  const newBlog = {
+    title: 'title',
+    author: 'author',
+    url: 'url',
+    likes: 25,
+  }
 
-    const postResponse = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+  const postResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
 
-    const response = await api.get('/api/blogs')
+  const response = await api.get('/api/blogs')
 
-    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
+  assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
 
-    // The new blog added to the database should be in the postResponse.body
-    const addedBlog = postResponse.body;
+  // The new blog added to the database should be in the postResponse.body
+  const addedBlog = postResponse.body
 
-    // Assert that the added blog has the same title, author, url, and likes as the one sent
-    assert.strictEqual(addedBlog.title, newBlog.title);
-    assert.strictEqual(addedBlog.author, newBlog.author);
-    assert.strictEqual(addedBlog.url, newBlog.url);
-    assert.strictEqual(addedBlog.likes, newBlog.likes);
+  // Assert that the added blog has the same title, author, url, and likes as the one sent
+  assert.strictEqual(addedBlog.title, newBlog.title)
+  assert.strictEqual(addedBlog.author, newBlog.author)
+  assert.strictEqual(addedBlog.url, newBlog.url)
+  assert.strictEqual(addedBlog.likes, newBlog.likes)
 })
 
 test('if the likes property is missing from the request, it will default to 0', async () => {
-    const newBlog = {
-        title: "title",
-        author: "author",
-        url: "url",
-    }
+  const newBlog = {
+    title: 'title',
+    author: 'author',
+    url: 'url',
+  }
 
-    const postResponse = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+  const postResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
 
-    // The new blog added to the database should be in the postResponse.body
-    const addedBlog = postResponse.body;
+  // The new blog added to the database should be in the postResponse.body
+  const addedBlog = postResponse.body
 
-    assert.strictEqual(addedBlog.likes, 0);
+  assert.strictEqual(addedBlog.likes, 0)
+})
+
+test('adding a blog without title gets status 400 Bad Request', async () => {
+  const newBlog = {
+    author: 'author',
+    url: 'url',
+    likes: 2,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('adding a blog without url gets status 400 Bad Request', async () => {
+  const newBlog = {
+    title: 'title',
+    author: 'author',
+    likes: 2,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
 
 
@@ -168,5 +194,5 @@ test('if the likes property is missing from the request, it will default to 0', 
 
 
 after(async () => {
-    await mongoose.connection.close()
+  await mongoose.connection.close()
 })
