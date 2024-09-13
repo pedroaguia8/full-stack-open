@@ -5,5 +5,6 @@ content-type: application/json
     "title": "LOL (lots of links)",
     "author": "Annie Rauwerda ",
     "url": "https://annierau.com/LOL-lots-of-links",
-    "likes": 5123
+    "likes": 5123,
+    "user": "66e44d0cb4c1a1766ebcf406"
 }
